@@ -16,6 +16,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
 
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "Espalier Tests"
+          git config --global user.email "espalier-tests@users.noreply.github.com"
+
       - name: Install Pester
         shell: pwsh
         run: |
