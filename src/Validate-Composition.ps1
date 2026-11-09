@@ -39,6 +39,12 @@ if (-not (Test-Path -LiteralPath $pomologyPath -PathType Leaf)) {
     throw "Pomology file does not exist: $pomologyPath"
 }
 
+& cue vet -c (Join-Path $PSScriptRoot 'pomology.cue') $pomologyPath
+
+if ($LASTEXITCODE -ne 0) {
+    throw 'Pomology validation against pomology.cue failed.'
+}
+
 if ([string]::IsNullOrWhiteSpace($variety)) {
     throw 'The selected variety was not supplied.'
 }

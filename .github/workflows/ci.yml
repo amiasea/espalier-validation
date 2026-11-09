@@ -16,6 +16,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
 
+      - name: Set up CUE
+        uses: cue-lang/setup-cue@v1.0.0
+
       - name: Configure Git identity
         run: |
           git config --global user.name "Espalier Tests"
