@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run Pester tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Install Pester
+        shell: pwsh
+        run: |
+          Install-Module Pester `
+            -RequiredVersion 6.2.0 `
+            -Force `
+            -Scope CurrentUser
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          $configuration = New-PesterConfiguration
+
+          $configuration.Run.Path = './tests'
+          $configuration.Run.Exit = $true
+          $configuration.Output.Verbosity = 'Detailed'
+
+          Invoke-Pester -Configuration $configuration

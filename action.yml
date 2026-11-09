@@ -1,0 +1,30 @@
+name: Espalier Composition Validation
+description: Validates a Leaf or Cordon composition against its Pomology definition.
+
+inputs:
+  type:
+    description: Composition type to validate (cordon or leaf).
+    required: true
+
+  pomology:
+    description: Path to the authoritative Pomology JSON file.
+    required: true
+
+  variety:
+    description: Selected Solution variety to validate.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Validate composition
+      shell: pwsh
+      env:
+        ESPALIER_TYPE: ${{ inputs.type }}
+        ESPALIER_POMOLOGY: ${{ inputs.pomology }}
+        ESPALIER_VARIETY: ${{ inputs.variety }}
+        ESPALIER_REPOSITORY_NAME: ${{ github.event.repository.name }}
+        ESPALIER_SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+        ESPALIER_TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
+      run: |
+        & "$env:GITHUB_ACTION_PATH/src/Validate-Composition.ps1"

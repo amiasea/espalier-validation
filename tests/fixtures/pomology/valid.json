@@ -1,0 +1,20 @@
+{
+  "varieties": [
+    "hermes"
+  ],
+  "aspectOptions": [
+    "gamma"
+  ],
+  "cordons": {
+    "enterprise": {
+      "tier": null,
+      "leaves": {
+        "host-api": {
+          "options": {
+            "hermes": "gamma"
+          }
+        }
+      }
+    }
+  }
+}
