@@ -26,7 +26,7 @@ BeforeAll {
     function New-TestCordon {
         param(
             [Parameter(Mandatory)]
-            [string[]] $Leaves
+            [string[]] $Submodules
         )
 
         $path = Join-Path $TestDrive ([guid]::NewGuid().ToString())
@@ -34,10 +34,10 @@ BeforeAll {
         New-TestComposition `
             -Path $path `
             -Leaves @(
-                foreach ($leaf in $Leaves) {
+                foreach ($submodule in $Submodules) {
                     @{
-                        Name = $leaf
-                        Path = $leaf
+                        Name = $submodule
+                        Path = $submodule
                     }
                 }
             )
@@ -45,7 +45,7 @@ BeforeAll {
 }
 
 Describe 'Validate-EspalierMissingSubmodule' {
-    It 'accepts a Cordon containing every Leaf declared in Pomology' {
+    It 'accepts a Cordon containing every direct submodule declared in Pomology' {
         $testPomology = New-TestPomology {
             param($definition)
 
@@ -56,7 +56,11 @@ Describe 'Validate-EspalierMissingSubmodule' {
             }
         }
 
-        $composition = New-TestCordon -Leaves @('host-api', 'worker')
+        $composition = New-TestCordon -Submodules @(
+            'host-api',
+            'worker',
+            'application'
+        )
 
         {
             Validate-EspalierMissingSubmodule `
@@ -77,7 +81,10 @@ Describe 'Validate-EspalierMissingSubmodule' {
             }
         }
 
-        $composition = New-TestCordon -Leaves @('host-api')
+        $composition = New-TestCordon -Submodules @(
+            'host-api',
+            'application'
+        )
 
         {
             Validate-EspalierMissingSubmodule `

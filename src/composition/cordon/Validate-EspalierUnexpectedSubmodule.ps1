@@ -36,11 +36,31 @@ function Validate-EspalierUnexpectedSubmodule {
 
     $cordon = $Pomology.cordons[$cordonName]
 
-    if ($null -eq $cordon.leaves -or $cordon.leaves.Count -eq 0) {
-        throw "Cordon '$cordonName' does not declare any Leaves in Pomology."
-    }
+    $declaredLeaves = @(
+        if ($null -ne $cordon.leaves) {
+            $cordon.leaves.Keys
+        }
+    )
 
-    $declaredLeaves = @($cordon.leaves.Keys)
+    $declaredCordons = @(
+        foreach ($name in $Pomology.cordons.Keys) {
+            if (
+                $name -ne $cordonName -and
+                $Pomology.cordons[$name].tier -eq $cordonName
+            ) {
+                $name
+            }
+        }
+    )
+
+    $expectedSubmodules = @(
+        $declaredLeaves
+        $declaredCordons
+    )
+
+    if ($expectedSubmodules.Count -eq 0) {
+        throw "Cordon '$cordonName' does not declare any direct submodules in Pomology."
+    }
 
     $gitlinks = @(
         git -C $RepositoryPath ls-files --stage |
@@ -57,18 +77,19 @@ function Validate-EspalierUnexpectedSubmodule {
 
     $unexpectedSubmodules = @(
         foreach ($gitlink in $gitlinks) {
-            if ($gitlink -notin $declaredLeaves) {
+            if ($gitlink -notin $expectedSubmodules) {
                 $gitlink
             }
         }
     )
 
     if ($unexpectedSubmodules.Count -gt 0) {
-        throw "Cordon '$cordonName' contains the following undeclared Leaf submodules: $($unexpectedSubmodules -join ', ')."
+        throw "Cordon '$cordonName' contains the following undeclared submodules: $($unexpectedSubmodules -join ', ')."
     }
 
     return [PSCustomObject]@{
         Cordon = $cordonName
         Leaves = $gitlinks
+        Cordons = $declaredCordons
     }
 }

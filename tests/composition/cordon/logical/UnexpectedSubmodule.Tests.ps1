@@ -10,13 +10,17 @@ BeforeAll {
 }
 
 Describe 'Validate-EspalierUnexpectedSubmodule' {
-    It 'accepts a Cordon containing only Leaves declared in Pomology' {
+    It 'accepts a Cordon containing only declared direct submodules' {
         $composition = New-TestComposition `
             -Path (Join-Path $TestDrive ([guid]::NewGuid().ToString())) `
             -Leaves @(
                 @{
                     Name = 'host-api'
                     Path = 'host-api'
+                },
+                @{
+                    Name = 'application'
+                    Path = 'application'
                 }
             )
 
@@ -35,6 +39,10 @@ Describe 'Validate-EspalierUnexpectedSubmodule' {
                 @{
                     Name = 'host-api'
                     Path = 'host-api'
+                },
+                @{
+                    Name = 'application'
+                    Path = 'application'
                 },
                 @{
                     Name = 'worker'

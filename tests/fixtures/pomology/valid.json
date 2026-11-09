@@ -15,6 +15,16 @@
           }
         }
       }
+    },
+    "application": {
+      "tier": "enterprise",
+      "leaves": {
+        "amiasea-api": {
+          "options": {
+            "hermes": "gamma"
+          }
+        }
+      }
     }
   }
 }

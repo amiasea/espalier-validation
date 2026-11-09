@@ -36,8 +36,30 @@ function Validate-EspalierMissingSubmodule {
 
     $cordon = $Pomology.cordons[$cordonName]
 
-    if ($null -eq $cordon.leaves -or $cordon.leaves.Count -eq 0) {
-        throw "Cordon '$cordonName' does not declare any Leaves in Pomology."
+    $leaves = @(
+        if ($null -ne $cordon.leaves) {
+            $cordon.leaves.Keys
+        }
+    )
+
+    $subordinateCordons = @(
+        foreach ($name in $Pomology.cordons.Keys) {
+            if (
+                $name -ne $cordonName -and
+                $Pomology.cordons[$name].tier -eq $cordonName
+            ) {
+                $name
+            }
+        }
+    )
+
+    $expectedSubmodules = @(
+        $leaves
+        $subordinateCordons
+    )
+
+    if ($expectedSubmodules.Count -eq 0) {
+        throw "Cordon '$cordonName' does not declare any direct submodules in Pomology."
     }
 
     $gitlinks = @(
@@ -53,20 +75,21 @@ function Validate-EspalierMissingSubmodule {
         throw "Unable to read Gitlinks from Cordon repository '$RepositoryPath'."
     }
 
-    $missingLeaves = @(
-        foreach ($leafName in $cordon.leaves.Keys) {
-            if ($leafName -notin $gitlinks) {
-                $leafName
+    $missingSubmodules = @(
+        foreach ($submoduleName in $expectedSubmodules) {
+            if ($submoduleName -notin $gitlinks) {
+                $submoduleName
             }
         }
     )
 
-    if ($missingLeaves.Count -gt 0) {
-        throw "Cordon '$cordonName' is missing the following declared Leaf submodules: $($missingLeaves -join ', ')."
+    if ($missingSubmodules.Count -gt 0) {
+        throw "Cordon '$cordonName' is missing the following declared submodules: $($missingSubmodules -join ', ')."
     }
 
     return [PSCustomObject]@{
         Cordon = $cordonName
-        Leaves = @($cordon.leaves.Keys)
+        Leaves = $leaves
+        Cordons = $subordinateCordons
     }
 }
